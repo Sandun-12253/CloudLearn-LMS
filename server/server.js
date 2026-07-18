@@ -11,14 +11,31 @@ const cors = require("cors");
 const app = express();
 
 
-// Middleware
+// Allowed Frontend URLs
+const allowedOrigins = [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5175",
+    "http://cloudlearn-group-307217365948-307217365948-eu-north-1-an.s3-website.eu-north-1.amazonaws.com"
+];
 
-// Allow React Frontend
+
+// Middleware - CORS
 app.use(cors({
-    origin:[
-        "http://localhost:5173",
-        "http://localhost:5174"
-        ]
+    origin: function (origin, callback) {
+
+        // Allow requests without origin (Postman, server-to-server)
+        if (!origin) {
+            return callback(null, true);
+        }
+
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+
+        return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true
 }));
 
 
@@ -36,7 +53,6 @@ const enrollmentRoutes = require("./routes/enrollmentRoutes");
 const quizRoutes = require("./routes/quizRoutes");
 const resultRoutes = require("./routes/resultRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
-
 
 
 
@@ -68,6 +84,7 @@ app.get("/", (req, res) => {
     res.send("CloudLearn LMS API Server Running 🚀");
 
 });
+
 
 
 
